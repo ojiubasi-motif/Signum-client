@@ -95,7 +95,7 @@ export default function Portfolio() {
           </p>
           <p className="text-gray-500 text-xs mt-1">
             {portfolio.winCount}W / {portfolio.lossCount}L /{' '}
-            {portfolio.missedCount}M
+            {portfolio.missedCount}M / {portfolio.canceledCount}C
           </p>
         </div>
         <div className="bg-[#131320] border border-white/6 rounded-2xl p-5">

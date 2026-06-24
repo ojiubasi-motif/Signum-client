@@ -36,7 +36,7 @@ function statusBadge(status: string) {
       label: 'Missed',
       cls: 'text-gray-400 bg-white/5',
     },
-    EXPIRED: { label: 'Expired', cls: 'text-gray-400 bg-white/5' },
+    EXPIRED: { label: 'Canceled', cls: 'text-gray-400 bg-white/5' },
   };
   const m = map[status] ?? { label: status, cls: 'text-gray-400 bg-white/5' };
   return (

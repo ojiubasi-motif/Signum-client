@@ -93,6 +93,7 @@ export interface PortfolioResponse {
   winCount: number;
   lossCount: number;
   missedCount: number;
+  canceledCount: number;
   completedPnLPercent: number;
   completedTrades: CompletedTrade[];
   activeTrades: ActiveTrade[];

@@ -237,7 +237,9 @@ export default function Dashboard() {
                       ? `+${fmt(sig.tpPercent, 1)}%`
                       : sig.status === 'SL_HIT'
                         ? `-${fmt(sig.slPercent, 1)}%`
-                        : sig.status.replace('_', ' ')}
+                        : sig.status === 'EXPIRED'
+                          ? 'Canceled'
+                          : sig.status.replace('_', ' ')}
                   </span>
                 </div>
               ))}
