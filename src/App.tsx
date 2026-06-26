@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Provider } from 'react-redux';
 import { store } from './store';
 import { useAppDispatch, useAppSelector } from './store/hooks';
-import { logout } from './store/slices/authSlice';
+import { logoutUser } from './store/slices/authSlice';
 import { clearSignals } from './store/slices/signalsSlice';
 import { clearPortfolio } from './store/slices/portfolioSlice';
 import { clearAdmins } from './store/slices/adminsSlice';
+import AuthInitializer from './components/AuthInitializer';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Login from './pages/Login';
@@ -21,8 +22,9 @@ function AuthenticatedApp() {
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const handleLogout = () => {
-    dispatch(logout());
+  const handleLogout = async () => {
+    // Revoke refresh token on server + clear httpOnly cookie
+    await dispatch(logoutUser());
     dispatch(clearSignals());
     dispatch(clearPortfolio());
     dispatch(clearAdmins());
@@ -70,9 +72,19 @@ function AuthenticatedApp() {
 }
 
 function AppGate() {
-  const token = useAppSelector((s) => s.auth.token);
+  const { initialized, member } = useAppSelector((s) => s.auth);
 
-  if (!token) {
+  // Show a minimal loading state while the silent restore is in progress.
+  // This prevents a flash of the Login page on every browser refresh.
+  if (!initialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a14]">
+        <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!member) {
     return <Login />;
   }
 
@@ -82,6 +94,7 @@ function AppGate() {
 export default function App() {
   return (
     <Provider store={store}>
+      <AuthInitializer />
       <AppGate />
     </Provider>
   );

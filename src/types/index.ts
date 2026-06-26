@@ -57,7 +57,7 @@ export interface Member {
 }
 
 export interface AuthResponse {
-  token: string;
+  access_token: string;
   member: Member;
 }
 
