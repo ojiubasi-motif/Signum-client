@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Bot } from 'lucide-react';
 import { Provider } from 'react-redux';
 import { store } from './store';
 import { useAppDispatch, useAppSelector } from './store/hooks';
@@ -9,6 +10,7 @@ import { clearAdmins } from './store/slices/adminsSlice';
 import AuthInitializer from './components/AuthInitializer';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
+import BotDialog from './components/BotDialog';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Signals from './pages/Signals';
@@ -21,6 +23,7 @@ function AuthenticatedApp() {
   const dispatch = useAppDispatch();
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isBotOpen, setIsBotOpen] = useState(false);
 
   const handleLogout = async () => {
     // Revoke refresh token on server + clear httpOnly cookie
@@ -67,6 +70,23 @@ function AuthenticatedApp() {
         />
         <main className="flex-1 overflow-y-auto">{pageMap[currentPage]}</main>
       </div>
+
+      {/* Floating Bot FAB */}
+      <button
+        id="bot-fab"
+        onClick={() => setIsBotOpen(prev => !prev)}
+        aria-label="Open Signum Bot"
+        className={`fixed bottom-5 right-5 z-50 w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 ${
+          isBotOpen
+            ? 'bg-emerald-500 shadow-emerald-500/40 scale-95'
+            : 'bg-[#1a1a30] border border-emerald-500/40 hover:border-emerald-500 hover:bg-emerald-600/20 shadow-black/40 hover:scale-105'
+        }`}
+      >
+        <Bot size={20} className={isBotOpen ? 'text-white' : 'text-emerald-400'} />
+      </button>
+
+      {/* Bot Dialog */}
+      <BotDialog isOpen={isBotOpen} onClose={() => setIsBotOpen(false)} />
     </div>
   );
 }
