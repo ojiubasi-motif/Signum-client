@@ -43,6 +43,10 @@ export interface Signal {
   enrichment: Record<string, unknown> | null;
   livePriceAtPost: number | null;
   coingeckoId: string | null;
+  poolNetwork: string | null;
+  poolAddress: string | null;
+  tokenAddress: string | null;
+  marketUnavailable: boolean;
   resolvedAt: string | null;
   createdAt: string;
   admin: Admin;

@@ -10,6 +10,7 @@ import {
   Clock,
   CheckCircle2,
   Radio,
+  AlertTriangle,
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { fetchActiveSignals, fetchSignalHistory } from '../store/slices/signalsSlice';
@@ -21,6 +22,27 @@ function fmt(n: number, d = 2) {
     minimumFractionDigits: d,
     maximumFractionDigits: d,
   });
+}
+
+function fmtPrice(price: number | null | undefined): string {
+  if (price === null || price === undefined) return '';
+  if (price === 0) return '0.0000';
+  
+  const sigStr = price.toPrecision(4);
+  if (!sigStr.includes('e')) {
+    return sigStr;
+  }
+  
+  const val = Number(sigStr);
+  const exponent = parseInt(sigStr.split('e')[1], 10);
+  
+  if (Math.abs(val) >= 1) {
+    const decimals = Math.max(0, 3 - exponent);
+    return val.toFixed(decimals);
+  }
+  
+  const decimals = 3 - exponent;
+  return val.toFixed(decimals);
 }
 
 function statusBadge(status: string) {
@@ -95,24 +117,31 @@ function SignalCard({
           {statusBadge(signal.status)}
         </div>
 
+        {/* Market data unavailability notice */}
+        {signal.marketUnavailable && (
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 mb-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+            <AlertTriangle size={12} className="text-amber-400 shrink-0" />
+            <span className="text-amber-400 text-xs">Market data unavailable — monitor manually</span>
+          </div>
+        )}
         {/* Key metrics */}
         <div className="grid grid-cols-3 gap-3 mb-4">
           <div className="bg-white/3 rounded-lg p-2.5 text-center">
             <p className="text-gray-500 text-xs mb-0.5">Entry Zone</p>
             <p className="text-white text-xs font-medium">
-              ${fmt(signal.entryMin)} – ${fmt(signal.entryMax)}
+              ${fmtPrice(signal.entryMin)} – ${fmtPrice(signal.entryMax)}
             </p>
           </div>
           <div className="bg-white/3 rounded-lg p-2.5 text-center">
             <p className="text-gray-500 text-xs mb-0.5">Take Profit</p>
             <p className="text-emerald-400 text-xs font-semibold">
-              ${fmt(signal.tpPrice)} (+{fmt(signal.tpPercent, 1)}%)
+              ${fmtPrice(signal.tpPrice)} (+{fmt(signal.tpPercent, 1)}%)
             </p>
           </div>
           <div className="bg-white/3 rounded-lg p-2.5 text-center">
             <p className="text-gray-500 text-xs mb-0.5">Stop Loss</p>
             <p className="text-red-400 text-xs font-semibold">
-              ${fmt(signal.slPrice)} (-{fmt(signal.slPercent, 1)}%)
+              ${fmtPrice(signal.slPrice)} (-{fmt(signal.slPercent, 1)}%)
             </p>
           </div>
         </div>
@@ -191,30 +220,38 @@ function SignalCard({
               </div>
             </div>
 
+            {/* Market data unavailability notice */}
+            {signal.marketUnavailable && (
+              <div className="flex items-center gap-1.5 px-2.5 py-1.5 mb-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                <AlertTriangle size={12} className="text-amber-400 shrink-0" />
+                <span className="text-amber-400 text-xs">Market data unavailable — monitor manually</span>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-3 mb-5">
               {[
                 {
                   icon: Target,
                   label: 'Entry Zone',
-                  value: `$${fmt(signal.entryMin)} – $${fmt(signal.entryMax)}`,
+                  value: `$${fmtPrice(signal.entryMin)} – $${fmtPrice(signal.entryMax)}`,
                 },
                 {
                   icon: Zap,
                   label: 'Live at Post',
                   value: signal.livePriceAtPost
-                    ? `$${fmt(signal.livePriceAtPost)}`
+                    ? `$${fmtPrice(signal.livePriceAtPost)}`
                     : '—',
                 },
                 {
                   icon: Target,
                   label: 'Take Profit',
-                  value: `$${fmt(signal.tpPrice)} (+${fmt(signal.tpPercent, 1)}%)`,
+                  value: `$${fmtPrice(signal.tpPrice)} (+${fmt(signal.tpPercent, 1)}%)`,
                   cls: 'text-emerald-400',
                 },
                 {
                   icon: Shield,
                   label: 'Stop Loss',
-                  value: `$${fmt(signal.slPrice)} (-${fmt(signal.slPercent, 1)}%)`,
+                  value: `$${fmtPrice(signal.slPrice)} (-${fmt(signal.slPercent, 1)}%)`,
                   cls: 'text-red-400',
                 },
               ].map(({ icon: Icon, label, value, cls }) => (
